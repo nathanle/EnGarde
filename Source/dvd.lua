@@ -2,20 +2,19 @@ import "CoreLibs/graphics"
 import "CoreLibs/object"
 import "CoreLibs/sprites"
 
-local playerSprite = nil
-local Player = {}
+
 local gfx <const> = playdate.graphics
 
 
 dvd={}
-class("dvd").extends()
+class("Player").extends(gfx.sprite)
 
-
+local imageSpritePLayer = gfx.image.new(images.sword4)
 function Player:init()
 	
 	Player.super.init(self)
 
-	self.playerImages = playdate.graphics.imagetable.new('images/sword4_rot')
+	self.playerImages = playdate.graphics.imagetable.new('images/sword4--table-50-40')
 	self:setImage(self.playerImages:getImage(1))
 	self:setZIndex(1000)
 	self:setCenter(0.5, 1)	-- set center point to center bottom middle

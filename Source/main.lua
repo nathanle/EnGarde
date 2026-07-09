@@ -1,28 +1,31 @@
-import "dvd" -- DEMO
-local dvd = dvd(1, -1) -- DEMO
+import "CoreLibs/animation"
+import "CoreLibs/object"
+import "CoreLibs/graphics"
+import "CoreLibs/sprites"
 
-local gfx <const> = playdate.graphics
-local font = gfx.font.new('font/Mini Sans 2X') -- DEMO
+local gfx = playdate.graphics
 
-local function loadGame()
-	playdate.display.setRefreshRate(50) -- Sets framerate to 50 fps
-	math.randomseed(playdate.getSecondsSinceEpoch()) -- seed for math.random
-	gfx.setFont(font) -- DEMO
-end
+local accumulatedRotation = 0
 
-local function updateGame()
-	dvd:update() -- DEMO
-end
+local spriteSheet, message = gfx.imagetable.new("images/sword4-table-76-76")
+assert(spriteSheet, message)
 
-local function drawGame()
-	gfx.clear() -- Clears the screen
-	dvd:draw() -- DEMO
-end
+local animationLoop, message = gfx.animation.loop.new(200, spriteSheet, true)
+assert(animationLoop, message)
 
-loadGame()
+local mySprite = gfx.sprite.new(animationLoop:image())
+mySprite:moveTo(200, 120)
+mySprite:add()
 
 function playdate.update()
-	updateGame()
-	drawGame()
-	playdate.drawFPS(0,0) -- FPS widget
+    local crankDelta = playdate.getCrankChange()
+    
+    -- 3. Update rotation if the crank is moving
+    if crankDelta ~= 0 then
+        accumulatedRotation = accumulatedRotation + crankDelta
+        mySprite:setRotation(accumulatedRotation)
+    end
+    
+    --mySprite:setImage(animationLoop:image())
+    gfx.sprite.update()
 end
