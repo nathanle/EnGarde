@@ -19,7 +19,15 @@ local mySprite = gfx.sprite.new(animationLoop:image())
 mySprite:moveTo(200, 120)
 mySprite:add()
 
+
+-- local poly = playdate.geometry.rect.new(0, 0, 10, 10)
+--local otherpoly = playdate.geometry.polygon.new(x1, y1, x2, y2, x3, y3)
+
 function playdate.update()
+    --if poly:intersects(otherPoly) then
+        -- Handle collision
+    --end    
+    mySprite:setCollideRect(35,5,5,50)
     local x, y = mySprite:getPosition()
     local crankDelta = playdate.getCrankChange()
     if playdate.buttonIsPressed(playdate.kButtonUp) then
@@ -40,6 +48,7 @@ function playdate.update()
     end
     
     --mySprite:setImage(animationLoop:image())
-    mySprite:moveTo(x, y)
+
+    mySprite:moveWithCollisions(x, y)
     gfx.sprite.update()
 end
