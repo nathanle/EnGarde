@@ -6,8 +6,12 @@ import "CoreLibs/sprites"
 local gfx = playdate.graphics
 
 local accumulatedRotation = 0
+
+local geom = playdate.geometry
+
 local speed = 2
 
+-- import "needle"
 
 local spriteSheet, message = gfx.imagetable.new("images/sword4-table-76-76")
 assert(spriteSheet, message)
@@ -19,17 +23,45 @@ local mySprite = gfx.sprite.new(animationLoop:image())
 mySprite:moveTo(200, 120)
 mySprite:add()
 
+local myRect = geom.rect.new(300, 120, 20, 100)
+local rx, ry, rw, rh = myRect:unpack()
 
--- local poly = playdate.geometry.rect.new(0, 0, 10, 10)
---local otherpoly = playdate.geometry.polygon.new(x1, y1, x2, y2, x3, y3)
+gfx.sprite.setBackgroundDrawingCallback(
+    function( x, y, width, height )
+        gfx.setClipRect( x, y, width, height ) -- let's only draw the part of the screen that's dirty
+        gfx.fillRect(rx, ry, rw, rh)
+        gfx.clearClipRect() -- clear so we don't interfere with drawing that comes after this
+        
+    end
+)
+
 
 function playdate.update()
-    --if poly:intersects(otherPoly) then
-        -- Handle collision
-    --end    
-    mySprite:setCollideRect(35,5,5,50)
+
     local x, y = mySprite:getPosition()
-    local crankDelta = playdate.getCrankChange()
+
+    local crankAngle = 0
+    local crankDelta = 0
+
+    if not playdate.isCrankDocked() then
+        crankDelta = playdate.getCrankChange()
+        crankAngle = playdate.getCrankPosition()
+    end
+
+    if playdate.isCrankDocked() then
+        crankDelta = 0
+        crankAngle = 0
+        mySprite:setRotation(0)
+    end
+
+    --local rect = geom.rect.new(200, 120, 20, 100)
+    --local rectPolygon = rect:toPolygon()
+    --local transform = geom.affineTransform.new()
+    
+    --transform:rotate(crankAngle, 200, 120)
+    --local rotatedPoly = transform:transformedPolygon(rectPolygon)
+    --gfx.drawPolygon(rotatedPoly)
+
     if playdate.buttonIsPressed(playdate.kButtonUp) then
         y = y - speed
     elseif playdate.buttonIsPressed(playdate.kButtonDown) then
@@ -46,9 +78,14 @@ function playdate.update()
         accumulatedRotation = accumulatedRotation + crankDelta
         mySprite:setRotation(accumulatedRotation)
     end
-    
-    --mySprite:setImage(animationLoop:image())
 
-    mySprite:moveWithCollisions(x, y)
+ 
+
+
+    -- function Needle:draw()
+    --    gfx.fillRect(0, 0, self.width, self.height)
+    -- end
+
+    mySprite:moveTo(x, y)
     gfx.sprite.update()
 end
